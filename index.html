@@ -17,7 +17,7 @@
   <h1>Quill Helper ✨</h1>
 
   <label for="custom">Custom Instructions (optional):</label>
-  <textarea id="custom">Answer clearly and completely. Combine sentences when possible. Use proper grammar.</textarea>
+  <textarea id="custom">You are a helpful assistant. Answer clearly and completely, combining sentences when possible.</textarea>
 
   <label for="input">Quill Question:</label>
   <textarea id="input" placeholder="Paste your Quill question here..."></textarea>
@@ -41,8 +41,8 @@
     }
 
     document.getElementById("generateBtn").addEventListener("click", async () => {
-      const question = document.getElementById("input").value;
-      const custom = document.getElementById("custom").value;
+      const question = document.getElementById("input").value.trim();
+      const custom = document.getElementById("custom").value.trim();
       if (!question) return alert("Enter a question first!");
 
       document.getElementById("output").textContent = "Thinking...";
