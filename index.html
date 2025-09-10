@@ -3,76 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quill Helper</title>
+  <title>Quill Helper ✨</title>
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #f9f9ff;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: #6c63ff;
-      color: white;
-    }
-    .output {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      min-height: 60px;
-    }
+    body { font-family: sans-serif; max-width:700px; margin:2rem auto; background:#f9f9ff; padding:1rem; }
+    textarea { width:100%; margin-bottom:1rem; padding:0.5rem; font-size:1rem; border-radius:5px; border:1px solid #ccc; }
+    #custom { height:60px; }
+    button { padding:0.7rem 1.2rem; font-size:1rem; border:none; border-radius:6px; cursor:pointer; background:#6c63ff; color:white; }
+    .output { margin-top:1.5rem; padding:1rem; background:white; border:1px solid #ddd; border-radius:6px; min-height:60px; white-space:pre-wrap; }
+    label { font-weight:bold; display:block; margin-bottom:0.3rem; }
   </style>
 </head>
 <body>
   <h1>Quill Helper ✨</h1>
-  <p>Paste your Quill question or text here and click "Generate".</p>
-  <textarea id="input" placeholder="Paste your question..."></textarea>
-  <br />
+
+  <label for="custom">Custom Instructions (optional):</label>
+  <textarea id="custom" placeholder="e.g., Answer clearly and combine sentences."></textarea>
+
+  <label for="input">Quill Question:</label>
+  <textarea id="input" placeholder="Paste your Quill question here..."></textarea>
+
   <button id="generateBtn">Generate Answer</button>
+
   <div class="output" id="output">AI answer will appear here...</div>
 
-  <script type="module">
-    import OpenAI from "https://cdn.jsdelivr.net/npm/openai@4.0.0/dist/openai.min.js";
+  <script>
+    // 🌐 Replace with your deployed Cloudflare Worker URL
+    const WORKER_URL = "https://quill.ethantytang11.workers.dev";
 
-    // put your API key here
-    const client = new OpenAI({
-      apiKey: "YOUR_OPENAI_API_KEY",
-      dangerouslyAllowBrowser: true
-    });
+    async function askLlama(prompt, customText) {
+      const resp = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, custom: customText })
+      });
+      const data = await resp.json();
+      return data.answer || "No answer 😢";
+    }
 
-    const input = document.getElementById("input");
-    const output = document.getElementById("output");
-    const btn = document.getElementById("generateBtn");
-
-    btn.addEventListener("click", async () => {
-      output.textContent = "Thinking...";
+    document.getElementById("generateBtn").addEventListener("click", async () => {
+      const question = document.getElementById("input").value;
+      const custom = document.getElementById("custom").value;
+      if (!question) {
+        alert("Please enter a question first!");
+        return;
+      }
+      document.getElementById("output").textContent = "Thinking...";
       try {
-        const response = await client.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: "You are a helpful writing assistant. Take grammar questions or sentence combining tasks and produce a correct, clear answer. The prompt is from the Quill writing app, so don't overcomplicate the sentence. The input will be the topic the student is learning, and then the sentence that is needed to be corrected. They are separeated by a comma." },
-            { role: "user", content: input.value }
-          ],
-        });
-        output.textContent = response.choices[0].message.content;
+        const answer = await askLlama(question, custom);
+        document.getElementById("output").textContent = answer;
       } catch (err) {
         console.error(err);
-        output.textContent = "Error: " + err.message;
+        document.getElementById("output").textContent = "Error: " + err.message;
       }
     });
   </script>
