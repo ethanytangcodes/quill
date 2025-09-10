@@ -16,8 +16,8 @@
 <body>
   <h1>Quill Helper ✨</h1>
 
-  <label for="custom">Custom Instructions (optional):</label>
-  <textarea id="custom" placeholder="e.g., Answer clearly and combine sentences."></textarea>
+  <label for="custom">Custom Instructions:</label>
+  <textarea id="custom">You are a helpful writing assistant. Take grammar questions or sentence combining tasks and produce a correct, clear answer. The prompt is from the Quill student writing app, so don't overcomplicate the sentence.</textarea>
 
   <label for="input">Quill Question:</label>
   <textarea id="input" placeholder="Paste your Quill question here..."></textarea>
@@ -28,13 +28,16 @@
 
   <script>
     // 🌐 Replace with your deployed Cloudflare Worker URL
-    const WORKER_URL = "https://quill.ethantytang11.workers.dev";
+    const WORKER_URL = "https://quill.ethantytang11.workers.dev/";
 
     async function askLlama(prompt, customText) {
+      // use the default text if customText is empty
+      const finalCustomText = customText || document.getElementById("custom").value;
+
       const resp = await fetch(WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, custom: customText })
+        body: JSON.stringify({ prompt, custom: finalCustomText })
       });
       const data = await resp.json();
       return data.answer || "No answer 😢";
