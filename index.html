@@ -47,4 +47,13 @@
 
       document.getElementById("output").textContent = "Thinking...";
       try {
-        const answer = await askLlama(question,
+        const answer = await askLlama(question, custom);
+        document.getElementById("output").textContent = answer;
+      } catch (err) {
+        console.error(err);
+        document.getElementById("output").textContent = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
