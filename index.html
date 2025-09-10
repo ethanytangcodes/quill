@@ -16,8 +16,8 @@
 <body>
   <h1>Quill Helper ✨</h1>
 
-  <label for="custom">Custom Instructions:</label>
-  <textarea id="custom">You are a helpful writing assistant. Take grammar questions or sentence combining tasks and produce a correct, clear answer. The prompt is from the Quill grammar writing app, so don't overcomplicate the sentence. The input will be the topic the student is learning, and then the sentence that is needed to be corrected. They are separeated by a comma.</textarea>
+  <label for="custom">Custom Instructions (optional):</label>
+  <textarea id="custom">Answer clearly and completely. Combine sentences when possible. Use proper grammar.</textarea>
 
   <label for="input">Quill Question:</label>
   <textarea id="input" placeholder="Paste your Quill question here..."></textarea>
@@ -43,19 +43,8 @@
     document.getElementById("generateBtn").addEventListener("click", async () => {
       const question = document.getElementById("input").value;
       const custom = document.getElementById("custom").value;
-      if (!question) {
-        alert("Please enter a question first!");
-        return;
-      }
+      if (!question) return alert("Enter a question first!");
+
       document.getElementById("output").textContent = "Thinking...";
       try {
-        const answer = await askLlama(question, custom);
-        document.getElementById("output").textContent = answer;
-      } catch (err) {
-        console.error(err);
-        document.getElementById("output").textContent = "Error: " + err.message;
-      }
-    });
-  </script>
-</body>
-</html>
+        const answer = await askLlama(question,
